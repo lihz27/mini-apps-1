@@ -1,33 +1,28 @@
-$(document).ready(function() {
+var app = {
 
-	$('#app').append(`<form id='form'></form>`);
-	$('#form').append(`<input type=textarea id='text'>`);
-	$('#form').append(`<button type=submit id="submit">Submit</button>`);
+	init: function() {
+		$('#app').append(`<form id='form'></form>`);
+		$('#form').append(`<input type=textarea id='text'>`);
+		$('#form').append(`<button type=submit id="submit">Submit</button>`);
+		$('#submit').on('click', app.handleSubmit);
+	},
 
-	$app = $('#app');
-	$form = $('#form');
-	$text = $('#text');
-	$submit = $('#submit');
-
-	var handleSubmit = function(event) {
-		var message = { text: $text.val() }; 
+	handleSubmit: function(event) {
+		var message = { text: $('#text').val() }; 
 		$.ajax({
 			type: 'POST',
 			data: JSON.stringify(message),
 			contentType: 'application/json',
 			success: function(data) {
-				$text.val(''); 
-				console.log(data);
-				render(data);
+				$('#text').val(''); 
+				app.render(data);
 			}
 		});
 		event.preventDefault();
+	}, 
+
+	render: function(data) {
+		$('#app').append(data);
 	}
 
-	$submit.on('click', handleSubmit);
-
-	var render = function(data) {
-		$app.append(data);
-	}
-
-});
+}
