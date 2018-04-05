@@ -1,6 +1,6 @@
 const WIN_CONDITION = 4;
-// const NUM_ROWS = 6;
-// const NUM_COLS = 7;
+const NUM_ROWS = 6;
+const NUM_COLS = 7;
 
 class App extends React.Component {
 	
@@ -28,7 +28,8 @@ class App extends React.Component {
 				<tbody>
 					{this.state.board.map((row, rowNum) => 
 						<tr key={`row${rowNum}`}>{row.map((col, colNum) => 
-							<td key={`row${rowNum} col${colNum}`} onClick={this.toggle.bind(this,rowNum,colNum)}>{col}</td>)}
+							<td key={`row${rowNum} col${colNum}`} 
+									onClick={this.toggle.bind(this,rowNum,colNum)}>{col}</td>)}
 						</tr>)}
 				</tbody>
 			</table>
@@ -55,17 +56,17 @@ class App extends React.Component {
 	
 	checkWinner() {
 		if (!!this.checkRows()) { console.log(this.checkRows() + ' wins!') };
-		// checkCols();
-		// checkMajDiags();
+		if (!!this.checkCols()) { console.log(this.checkCols() + ' wins!') };
+		if (!!this.checkMajDiags()) { console.log(this.checkMajDiags() + ' wins!') };
 		// checkMinorDiags();
 		// checkTie();
 	}
 	
 	checkRows() {
-		for (var rowNum = 0; rowNum < this.state.board.length; rowNum++) {
+		for (var rowNum = 0; rowNum < NUM_ROWS; rowNum++) {
 			var p1Counter = 0;
 			var p2Counter = 0;
-			for (var colNum = 0; colNum < this.state.board[rowNum].length; colNum++) {
+			for (var colNum = 0; colNum < NUM_COLS; colNum++) {
 				if (this.state.board[rowNum][colNum] === -1) { p1Counter += -1; p2Counter = 0 };
 				if (this.state.board[rowNum][colNum] === 0) { p1Counter = 0; p2Counter = 0 };
 				if (this.state.board[rowNum][colNum] === 1) { p1Counter = 0; p2Counter += 1 };
@@ -75,8 +76,48 @@ class App extends React.Component {
 		}
 	}
 
-	// checkCols()
-	// checkMajDiags()
+	checkCols() {
+		for (var colNum = 0; colNum < NUM_COLS; colNum++) {
+			var col = [];
+			for (var rowNum = 0; rowNum < NUM_ROWS; rowNum++) {
+				col.push(this.state.board[rowNum][colNum]);
+			}
+			var p1Counter = 0;
+			var p2Counter = 0;
+			for (var i = 0; i < col.length; i++) {
+				if (col[i] === -1) { p1Counter += -1; p2Counter = 0 };
+				if (col[i] === 0) { p1Counter = 0; p2Counter = 0 };
+				if (col[i] === 1) { p1Counter = 0; p2Counter += 1 };
+				if (p1Counter === -WIN_CONDITION) { return this.players['-1']; };
+				if (p2Counter === WIN_CONDITION) { return this.players['1']; };
+			}
+		}
+	}
+
+	inBounds(rowNum, colNum) {
+		return 0 <= rowNum && rowNum < NUM_ROWS && 0 <= colNum && colNum < NUM_COLS;
+	}
+
+	checkMajDiags() {
+		for (var majDiag = -NUM_ROWS + WIN_CONDITION; majDiag < NUM_COLS - WIN_CONDITION; majDiag++) {
+			var md = [];
+			for (var i = majDiag; i < NUM_COLS; i++) {
+				if (this.inBounds(i, i - majDiag)) {
+					var val = this.state.board[i][i - majDiag];
+					md.push(val);
+				}
+			}
+			var p1Counter = 0;
+			var p2Counter = 0;
+			for (var j = 0; j < md.length; j++) {
+				if (md[j] === -1) { p1Counter += -1; p2Counter = 0 };
+				if (md[j] === 0) { p1Counter = 0; p2Counter = 0 };
+				if (md[j] === 1) { p1Counter = 0; p2Counter += 1 };
+				if (p1Counter === -WIN_CONDITION) { return this.players['-1']; };
+				if (p2Counter === WIN_CONDITION) { return this.players['1']; };
+			}
+		}
+	}
 	// checkMinorDiags()
 	// checkTie()
 
