@@ -1,0 +1,16 @@
+.keyNum {
+	display: inline-block;
+	border: 1px solid black;
+	color: red;
+	font-size: 36px;
+	text-align: center;
+	width: 45px;
+}
+
+.frame {
+	display: inline-block;
+	border: 1px solid black;
+	font-size: 24px;
+	height: 30px;
+	width: 50px;
+}
