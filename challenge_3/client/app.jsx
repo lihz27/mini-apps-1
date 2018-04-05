@@ -37,29 +37,30 @@ class App extends React.Component {
 	}
 
 	toggle(rowNum, colNum) {
-		var emptyRow;
+		var emptyRow = null;
 		for (var i = this.state.board.length - 1; i >=0; i--) {
 			if (this.state.board[i][colNum] === 0) {
 				emptyRow = i;
 				break;
 			}
 		}
-		this.setState(prevState => {
-			prevState.board[emptyRow][colNum] = prevState.whosTurn;
-			return { board: prevState.board }, this.checkWinner();
-		})
-		this.setState(prevState => {
-			return { whosTurn: prevState.whosTurn * -1};
-		})
-		
+		if (emptyRow !== null) {
+			this.setState(prevState => {
+				prevState.board[emptyRow][colNum] = prevState.whosTurn;
+				return { board: prevState.board }, this.checkWinner();
+			})
+			this.setState(prevState => {
+				return { whosTurn: prevState.whosTurn * -1};
+			})
+		}
 	}
 	
 	checkWinner() {
 		if (!!this.checkRows()) { console.log(this.checkRows() + ' wins!') };
 		if (!!this.checkCols()) { console.log(this.checkCols() + ' wins!') };
 		if (!!this.checkMajDiags()) { console.log(this.checkMajDiags() + ' wins!') };
-		// checkMinorDiags();
-		// checkTie();
+		if (!!this.checkMinDiags()) { console.log(this.checkMinDiags() + ' wins!') };
+		if (!!this.checkTie()) { console.log('Tie!') };
 	}
 	
 	checkRows() {
@@ -94,7 +95,7 @@ class App extends React.Component {
 		}
 	}
 
-	inBounds(rowNum, colNum) {
+	isInBounds(rowNum, colNum) {
 		return 0 <= rowNum && rowNum < NUM_ROWS && 0 <= colNum && colNum < NUM_COLS;
 	}
 
@@ -102,7 +103,7 @@ class App extends React.Component {
 		for (var majDiag = -NUM_ROWS + WIN_CONDITION; majDiag < NUM_COLS - WIN_CONDITION; majDiag++) {
 			var md = [];
 			for (var i = majDiag; i < NUM_COLS; i++) {
-				if (this.inBounds(i, i - majDiag)) {
+				if (this.isInBounds(i, i - majDiag)) {
 					var val = this.state.board[i][i - majDiag];
 					md.push(val);
 				}
@@ -118,8 +119,37 @@ class App extends React.Component {
 			}
 		}
 	}
-	// checkMinorDiags()
-	// checkTie()
+	
+	checkMinDiags() {
+		for (var minDiag = NUM_COLS - 1 + NUM_ROWS - WIN_CONDITION; minDiag >= 0; minDiag--) {
+			var md = [];
+			for (var i = minDiag; i >= 0; i--) {
+				if (this.isInBounds(minDiag - i, i)) {
+					var val = this.state.board[minDiag - i][i];
+					md.push(val);
+				}
+			}
+			var p1Counter = 0;
+			var p2Counter = 0;
+			for (var j = 0; j < md.length; j++) {
+				if (md[j] === -1) { p1Counter += -1; p2Counter = 0 };
+				if (md[j] === 0) { p1Counter = 0; p2Counter = 0 };
+				if (md[j] === 1) { p1Counter = 0; p2Counter += 1 };
+				if (p1Counter === -WIN_CONDITION) { return this.players['-1']; };
+				if (p2Counter === WIN_CONDITION) { return this.players['1']; };
+			}
+		}
+	}
+	
+	checkTie() {
+		var isTie = true;
+		for (var i = 0; i < this.state.board.length; i++) {
+			if (this.state.board[i].includes(0)) {
+				isTie = isTie && false
+			}
+		}
+		return isTie;
+	}
 
 }
 
